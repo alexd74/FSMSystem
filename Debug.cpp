@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <execinfo.h>
 #include <sys/time.h>
+#include <pthread.h>
+#include <boost/format.hpp>
 //}}}
 
 #ifndef DEBUG_ENABLED
@@ -294,6 +296,28 @@ std::clock_t theTimePeriod   = 0;
 TSourceMap   theSources;
 TPeriodMap   thePeriodMap;
 
+void IncIndent()
+{
+	++theIndentDepth;
+}
+
+
+void  DecIndent()
+{
+	--theIndentDepth;
+}
+
+size_t GetIndentDepth()
+{
+  return theIndentDepth;
+}
+
+unsigned int GetThreadID()
+{
+  return  static_cast<unsigned long>( pthread_self() ) ; // % 100;
+}
+
+
 CPeriodData::CPeriodData() : theTriggersCount( 0 ),
 theTriggeredTime( std::clock() - theTimePeriod * 2 )
 {
@@ -346,6 +370,8 @@ void PrintPeriodInfo( std::ostream & aOut, const Debug::CSourcePos & aWhere )
 
 void DoPrefix( Debug::LogLevel aLevel, std::ostream & aOStream )
 {
+  aOStream << boost::format( " Thread %1$2d: " ) % GetThreadID();
+
    if( theTimePrefix )
    {
       std::time_t aTime = std::time( 0 );
@@ -357,8 +383,7 @@ void DoPrefix( Debug::LogLevel aLevel, std::ostream & aOStream )
          aOStream << std::string( std::ctime( &aTime ), 24 ) ;
          if( theTimeUSPrefix )
          {
-            aOStream << ", " << aCurrentTime.tv_usec << " us ";
-
+            aOStream << boost::format( ", %1$6d us " ) % aCurrentTime.tv_usec;
          };
          aOStream << ": ";
       }
@@ -1035,7 +1060,9 @@ std::ostream & operator<<( std::ostream & aStream, const Indent & aIndent )
 {
    aStream << theIndentPrefix.c_str();
    DoPrefix( aIndent.theLogLevel, aStream );
-   for( unsigned int n = 0; n < theIndentDepth; n++ )
+
+   const size_t indentDepth = GetIndentDepth();
+   for( unsigned int n = 0; n < indentDepth; n++ )
       aStream << INDENT;
    return aStream;
 }
@@ -1163,7 +1190,9 @@ void Debug::CTracer::StartTrace()
    CDbgOStream & aStreamRef = DBGOUT( tracing );
 
 	aStreamRef << Indent( tracing );
-	theIndentDepth++;
+
+  IncIndent();
+
 	aStreamRef << TRACE_IN;
 	if( theName )
 	{
@@ -1187,13 +1216,14 @@ void Debug::CTracer::StopTrace()
 {
   DEBUG_LOCK;
 //   clock_t aStopTime = 0;
-   struct timeval    aStopTime;
+  struct timeval    aStopTime;
 
-   if( UseProfiling )
-      gettimeofday( &aStopTime, 0 );
+  if( UseProfiling )
+    gettimeofday( &aStopTime, 0 );
 //      aStopTime = clock();
 
-	theIndentDepth--;
+  DecIndent();
+
    CDbgOStream & aStreamRef = DBGOUT( tracing );
 
 	aStreamRef << Indent( tracing );
