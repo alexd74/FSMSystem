@@ -296,25 +296,49 @@ std::clock_t theTimePeriod   = 0;
 TSourceMap   theSources;
 TPeriodMap   thePeriodMap;
 
+struct ThreadInfo
+{
+  unsigned int ID;
+  int indentDepth;
+};
+
+
+typedef std::map<unsigned long, ThreadInfo> ThreadInfoMap;
+
+ThreadInfoMap theThreadInfoMap;
+
+ThreadInfo & GetThreadInfo()
+{
+  const unsigned long id = static_cast<unsigned long>( pthread_self() );
+
+  if( theThreadInfoMap.find( id ) == theThreadInfoMap.end() )
+  {
+    size_t mapSize = theThreadInfoMap.size();
+    theThreadInfoMap[id].ID = mapSize;
+  }
+
+  return theThreadInfoMap[id];
+}
+
 void IncIndent()
 {
-	++theIndentDepth;
+  ++( GetThreadInfo().indentDepth );
 }
 
 
 void  DecIndent()
 {
-	--theIndentDepth;
+  --( GetThreadInfo().indentDepth );
 }
 
-size_t GetIndentDepth()
+int GetIndentDepth()
 {
-  return theIndentDepth;
+  return GetThreadInfo().indentDepth;
 }
 
 unsigned int GetThreadID()
 {
-  return  static_cast<unsigned long>( pthread_self() ) ; // % 100;
+  return GetThreadInfo().ID;
 }
 
 
