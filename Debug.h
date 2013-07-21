@@ -845,6 +845,7 @@
 #include <syslog.h>
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 //}}}
 

@@ -8,7 +8,7 @@ AFLAGS = -f elf
 #INCLUDES  		= -I/usr/include/stlport -I.
 INCLUDES  		=  -I.
 #LIBS = -lstlport_gcc3 -lstdc++ 
-LIBS =  -lstdc++ -lboost_thread -lloki
+LIBS =  -lstdc++ -lboost_thread -lloki -lpthread
 DEBUG_LIBS = -lcppunit-gcc3.2
 DEPENDS_FILES = ./*.cpp
 
