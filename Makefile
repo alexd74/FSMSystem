@@ -27,7 +27,7 @@ TEST_PROGRAM_OBJECT = $(TEST_PROGRAM).o
 
 TEST_OBJECTS =
 
-OBJECTS = Debug.o TimerSystem.o ActiveObject.o Event.o
+OBJECTS = Debug.o TimerSystem.o ActiveObject.o Event.o Communicator.o
 
 OPTIMIZED_OBJECTS =
 

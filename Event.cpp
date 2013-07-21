@@ -73,7 +73,7 @@ void EventProcessorCollection::UnRegisterProcessor( EventProcessor* aProcessor )
   theProcessors.erase( it );
 } //}}}
 
-void EventProcessorCollection::Broadcast( const EventPointer & aEvent )
+void EventProcessorCollection::Broadcast( const EventPointer & aEvent ) //{{{
 {
   DEBUG_TRACER;
   boost::lock_guard<boost::mutex> guard( theLock );
@@ -83,15 +83,15 @@ void EventProcessorCollection::Broadcast( const EventPointer & aEvent )
     if( (*it)->IsEventOfInteres( aEvent ) )
       (*it)->PushEvent( aEvent );
   }
-}
+} //}}}
 
 typedef Loki::SingletonHolder< EventProcessorCollection > ProcessorsSingleton;
 
-void SendEvent( const EventPointer & aEvent )
+void SendEvent( const EventPointer & aEvent ) //{{{
 {
   DEBUG_TRACER;
   ProcessorsSingleton::Instance().Broadcast( aEvent );
-}
+} //}}}
 
 EventProcessor::EventProcessor( unsigned int aID ) //{{{
   : theID( aID ), theEventQueue( EVENTQ_MAX_SIZE )

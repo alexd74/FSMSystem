@@ -57,7 +57,7 @@ class EventProcessor : protected TimerSystem, protected boost::noncopyable //{{{
 {
 public:
   EventProcessor( unsigned int aID );
-  ~EventProcessor();
+  virtual ~EventProcessor();
 
   void PushEvent( const EventPointer & aEvent );
 
@@ -70,7 +70,7 @@ protected:
   enum { EVENTQ_MAX_SIZE = 256 };
   enum EventResult { EventPresent, EventTimeout, EventError };
 
-  EventResult GetEvent( EventPointer & aEvent, long aMaxWaitTime = WAIT_FOREWER );
+  virtual EventResult GetEvent( EventPointer & aEvent, long aMaxWaitTime = WAIT_FOREWER );
 
   virtual void OnEvent( const EventPointer & aEvent );
   virtual bool IsUserEventOfInteres( const EventPointer & /*aEvent*/ ) const
@@ -78,7 +78,7 @@ protected:
     return true;
   }
 
-private:
+//private:
   unsigned int theID;
   int thePipeFDs[2];
 
